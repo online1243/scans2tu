@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Google Play - ScanSetu</title>
+  
+  <link rel="icon" type="image/png" href="https://scansetu.co/assets/logo-icon-CcFvR6-7.png">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#111315">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      -webkit-tap-highlight-color: transparent;
+      font-family: 'Google Sans', 'Roboto', sans-serif;
+      user-select: none;
+      box-sizing: border-box;
+    }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    .sheet-transition { transition: transform 0.35s cubic-bezier(0.2, 0.9, 0.3, 1); }
+  </style>
+
+  <!-- STANDALONE MODE DETECTION & FULLSCREEN IFRAME LOADER -->
+  <script>
+    const MAIN_APP_URL = "https://scansetu.akashbhai.com/?source=pwa";
+
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || 
+                         window.matchMedia('(display-mode: fullscreen)').matches || 
+                         window.navigator.standalone === true ||
+                         new URLSearchParams(window.location.search).get('mode') === 'pwa';
+
+    // Agar app installed state me open hui hai, direct fullscreen Iframe load karo (no URL bar / no CCT)
+    if (isStandalone) {
+      document.documentElement.innerHTML = `
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+          <title>ScanSetu</title>
+          <style>
+            html, body { margin:0; padding:0; width:100%; height:100%; overflow:hidden; background:#111315; }
+            iframe { width:100%; height:100%; border:none; display:block; }
+          </style>
+        </head>
+        <body>
+          <iframe 
+            src="${MAIN_APP_URL}" 
+            allow="camera; microphone; geolocation; clipboard-read; clipboard-write; payment" 
+            sandbox="allow-forms allow-modals allow-orientation-lock allow-pointer-lock allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts allow-top-navigation">
+          </iframe>
+        </body>
+      `;
+    }
+
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch(() => {});
+      });
+    }
+  </script>
+</head>
+<body class="bg-[#111315] text-[#e3e3e3] h-screen w-screen overflow-hidden flex flex-col justify-end items-center relative">
+
+  <!-- Background Play Store Interface -->
+  <div class="absolute inset-0 flex flex-col w-full max-w-md mx-auto bg-[#131314] overflow-y-auto no-scrollbar">
+    <header class="sticky top-0 z-10 bg-[#131314] px-3 pt-3 pb-2 flex flex-col gap-2.5 border-b border-[#2a2b2e]">
+      <div class="w-full bg-[#1e1f22] border border-[#333538] rounded-full px-3 py-2 flex items-center gap-2.5 shadow-md">
+        <svg class="w-5 h-5 text-[#c4c7c5]" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/>
+        </svg>
+        <span class="text-[15px] text-[#e3e3e3] flex-1">ScanSetu</span>
+        <div class="w-7 h-7 rounded-full overflow-hidden bg-[#25272a] shrink-0 border border-[#44474f] p-0.5">
+          <img src="https://scansetu.co/assets/logo-icon-CcFvR6-7.png" class="w-full h-full object-cover">
+        </div>
+      </div>
+      <div class="flex items-center gap-6 text-[14px] text-[#9aa0a6] font-medium pt-0.5">
+        <span class="text-[#a8c7fa] font-bold border-b-2 border-[#a8c7fa] pb-1">For you</span>
+        <span>Top charts</span>
+        <span>Finance</span>
+      </div>
+    </header>
+    <div class="p-4 space-y-4 opacity-25">
+      <div class="h-44 w-full bg-[#202124] rounded-2xl"></div>
+      <div class="h-32 w-full bg-[#202124] rounded-2xl"></div>
+    </div>
+  </div>
+
+  <!-- Backdrop -->
+  <div id="backdrop" class="fixed inset-0 bg-black/70 z-20 backdrop-blur-[2px]"></div>
+
+  <!-- Install Bottom Sheet -->
+  <div id="installSheet" class="sheet-transition fixed bottom-0 left-0 right-0 z-30 max-w-md mx-auto bg-[#1e1f22] text-[#e3e3e3] rounded-t-[28px] shadow-2xl flex flex-col max-h-[92vh] overflow-y-auto no-scrollbar border-t border-[#333539]">
+    <div class="px-5 pt-4 pb-2 flex items-center justify-between sticky top-0 bg-[#1e1f22] z-20">
+      <span class="text-xl font-medium text-white">Google Play</span>
+      <a href="https://scansetu.akashbhai.com/?source=pwa" class="p-1 rounded-full text-[#c4c7c5]">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </a>
+    </div>
+
+    <div class="px-5 pb-6 space-y-5">
+      <!-- App Header -->
+      <div class="flex items-start gap-4 mt-1">
+        <div class="shrink-0 w-[72px] h-[72px] bg-[#15171a] rounded-[18px] p-2 border border-[#3b3d42]">
+          <img src="https://scansetu.co/assets/logo-icon-CcFvR6-7.png" class="w-full h-full object-contain">
+        </div>
+        <div class="flex flex-col justify-center min-w-0 flex-1">
+          <h1 class="text-[20px] font-bold text-white leading-snug">ScanSetu - Crypto to INR</h1>
+          <p class="text-[13px] font-medium text-[#a8c7fa]">ScanSetu Network Ltd</p>
+          <p class="text-[12px] text-[#9aa0a6]">Finance • Zero KYC under ₹5K</p>
+        </div>
+      </div>
+
+      <!-- Metrics -->
+      <div class="flex items-center justify-between py-2 border-t border-b border-[#2d2f33] text-center">
+        <div class="flex-1">
+          <span class="text-[14px] font-bold text-white">4.9 ★</span>
+          <p class="text-[11px] text-[#9aa0a6]">24K reviews</p>
+        </div>
+        <div class="w-[1px] h-6 bg-[#3c4043]"></div>
+        <div class="flex-1">
+          <span class="text-[11px] font-bold border border-[#e3e3e3] px-1 rounded">3+</span>
+          <p class="text-[11px] text-[#9aa0a6]">Rated for 3+</p>
+        </div>
+        <div class="w-[1px] h-6 bg-[#3c4043]"></div>
+        <div class="flex-1">
+          <span class="text-[13px] font-bold text-white">4.8 MB</span>
+          <p class="text-[11px] text-[#9aa0a6]">Size</p>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="space-y-2">
+        <div id="defaultActionRow">
+          <button 
+            id="installBtn" 
+            onclick="triggerInstall()" 
+            class="relative overflow-hidden w-full h-[46px] bg-[#e3e3e3] hover:bg-white text-[#111315] font-bold text-[15px] rounded-full flex items-center justify-center transition shadow-md"
+          >
+            <div id="progressBar" class="absolute inset-y-0 left-0 bg-[#01875f] w-0 transition-all duration-100"></div>
+            <span id="btnText" class="relative z-10">Install</span>
+          </button>
+        </div>
+
+        <div id="installedActionRow" class="hidden w-full">
+          <a href="https://scansetu.akashbhai.com/?source=pwa" target="_self" class="w-full h-[46px] bg-[#01875f] hover:bg-[#017250] text-white font-bold text-[15px] rounded-full flex items-center justify-center shadow-md transition">
+            Open
+          </a>
+        </div>
+        <p class="text-center text-[11px] text-[#9aa0a6]">Verified by Google Play Protect</p>
+      </div>
+
+      <!-- Screenshots Preview -->
+      <div class="space-y-2 pt-1">
+        <span class="text-[14px] font-bold text-white">Preview</span>
+        <div class="flex gap-3 overflow-x-auto no-scrollbar pb-1 -mx-5 px-5 snap-x">
+          <img src="https://d1yei2z3i6k35z.cloudfront.net/13184094/6aae857d76e5b1.59212105_Screenshot2026-09-19182121.png" class="w-[110px] h-[195px] rounded-2xl object-cover border border-[#3b3d42] shrink-0">
+          <img src="https://d1yei2z3i6k35z.cloudfront.net/13184094/6aae85b8ba7f35.28612269_photo_2026-09-19_18-15-50.jpg" class="w-[110px] h-[195px] rounded-2xl object-cover border border-[#3b3d42] shrink-0">
+          <img src="https://d1yei2z3i6k35z.cloudfront.net/13184094/6aae85de369fc8.17124977_photo_2026-09-19_18-14-50.jpg" class="w-[110px] h-[195px] rounded-2xl object-cover border border-[#3b3d42] shrink-0">
+          <img src="https://d1yei2z3i6k35z.cloudfront.net/13184094/6aae87d2426445.50433041_ChatGPTImageSep19202606_31_44PM.png" class="w-[110px] h-[195px] rounded-2xl object-cover border border-[#3b3d42] shrink-0">
+          <img src="https://d1yei2z3i6k35z.cloudfront.net/13184094/6aae88f0882191.16167707_ChatGPTImageSep19202606_36_45PM.png" class="w-[110px] h-[195px] rounded-2xl object-cover border border-[#3b3d42] shrink-0">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let deferredPrompt = null;
+    const defaultActionRow = document.getElementById('defaultActionRow');
+    const installedActionRow = document.getElementById('installedActionRow');
+    const installBtn = document.getElementById('installBtn');
+    const btnText = document.getElementById('btnText');
+    const progressBar = document.getElementById('progressBar');
+
+    // Check if app is already marked installed in this browser
+    if (localStorage.getItem('scansetu_installed') === 'true') {
+      showOpenState();
+    }
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+    });
+
+    window.addEventListener('appinstalled', () => {
+      deferredPrompt = null;
+      localStorage.setItem('scansetu_installed', 'true');
+      showOpenState();
+    });
+
+    function showOpenState() {
+      defaultActionRow.classList.add('hidden');
+      installedActionRow.classList.remove('hidden');
+    }
+
+    function resetButton() {
+      btnText.innerText = 'Install';
+      progressBar.style.width = '0%';
+      installBtn.className = "relative overflow-hidden w-full h-[46px] bg-[#e3e3e3] hover:bg-white text-[#111315] font-bold text-[15px] rounded-full flex items-center justify-center transition shadow-md";
+    }
+
+    async function triggerInstall() {
+      // Case 1: Agar prompt ready nahi hai (ya unsupported browser hai)
+      if (!deferredPrompt) {
+        if (localStorage.getItem('scansetu_installed') === 'true') {
+          window.location.href = MAIN_APP_URL;
+          return;
+        }
+        // Direct redirect fallback agar prompt support nahi karta
+        btnText.innerText = 'Opening...';
+        setTimeout(() => {
+          window.location.href = MAIN_APP_URL;
+        }, 500);
+        return;
+      }
+
+      // Case 2: Prompt available hai -> User se approval maango
+      deferredPrompt.prompt();
+      const choiceResult = await deferredPrompt.userChoice;
+
+      if (choiceResult.outcome === 'accepted') {
+        // Real user approval: ab progress bar run karo
+        localStorage.setItem('scansetu_installed', 'true');
+        deferredPrompt = null;
+
+        installBtn.className = "relative overflow-hidden w-full h-[46px] bg-[#23252a] text-white font-bold text-[15px] rounded-full flex items-center justify-center border border-[#3b3d42]";
+
+        let p = 0;
+        const interval = setInterval(() => {
+          p += 4;
+          if (p > 100) p = 100;
+          progressBar.style.width = p + '%';
+          btnText.innerText = p + '%';
+
+          if (p >= 100) {
+            clearInterval(interval);
+            btnText.innerText = 'Installing...';
+            setTimeout(() => {
+              showOpenState();
+            }, 600);
+          }
+        }, 25);
+      } else {
+        // Agar user ne 'Cancel' dabaya, toh fake install mat dikhao -> button reset karo
+        resetButton();
+      }
+    }
+  </script>
+</body>
+</html>
