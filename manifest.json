@@ -1,0 +1,38 @@
+{
+  "name": "ScanSetu - Crypto to INR",
+  "short_name": "ScanSetu",
+  "description": "Real-time Crypto to INR instant settlement",
+  "start_url": "./index.html?mode=pwa",
+  "scope": "./",
+  "display": "standalone",
+  "display_override": ["fullscreen", "standalone", "window-controls-overlay"],
+  "orientation": "portrait",
+  "background_color": "#111315",
+  "theme_color": "#111315",
+  "icons": [
+    {
+      "src": "https://scansetu.co/assets/logo-icon-CcFvR6-7.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "https://scansetu.co/assets/logo-icon-CcFvR6-7.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "https://scansetu.co/assets/logo-icon-CcFvR6-7.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "https://scansetu.co/assets/logo-icon-CcFvR6-7.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
