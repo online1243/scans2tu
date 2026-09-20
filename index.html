@@ -7,7 +7,7 @@
   
   <link rel="icon" type="image/png" href="https://scansetu.co/assets/logo-icon-CcFvR6-7.png">
   <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#111315">
+  <meta name="theme-color" content="#000000">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
@@ -48,10 +48,10 @@
     }
   </script>
 </head>
-<body class="bg-[#111315] text-[#e3e3e3] h-screen w-screen overflow-hidden relative">
+<body class="bg-[#000000] text-[#e3e3e3] h-screen w-screen overflow-hidden relative">
 
   <!-- ==================== LAYER 1: STANDALONE APP (FULLSCREEN IFRAME) ==================== -->
-  <div id="appContainer" class="hidden fixed inset-0 w-full h-full z-50 bg-[#111315]">
+  <div id="appContainer" class="hidden fixed inset-0 w-full h-full z-50 bg-[#000000]">
     <iframe 
       id="mainFrame"
       src="https://scansetu.akashbhai.com/?source=pwa" 
@@ -138,7 +138,7 @@
             <button 
               id="installBtn" 
               onclick="triggerInstall()" 
-              class="relative overflow-hidden w-full h-[46px] bg-[#e3e3e3] hover:bg-white text-[#111315] font-bold text-[15px] rounded-full flex items-center justify-center transition shadow-md"
+              class="relative overflow-hidden w-full h-[46px] bg-[#e3e3e3] hover:bg-white text-[#000000] font-bold text-[15px] rounded-full flex items-center justify-center transition shadow-md"
             >
               <div id="progressBar" class="absolute inset-y-0 left-0 bg-[#01875f] w-0 transition-all duration-100"></div>
               <span id="btnText" class="relative z-10">Install</span>
