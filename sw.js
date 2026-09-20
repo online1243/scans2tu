@@ -1,34 +1,30 @@
-const CACHE_NAME = 'scansetu-pwa-v3';
-const STATIC_ASSETS = [
+const CACHE_NAME = 'scansetu-pwa-v4';
+const SHELL_ASSETS = [
   './',
   './index.html',
   './manifest.json',
   'https://scansetu.co/assets/logo-icon-CcFvR6-7.png'
 ];
 
-// Install: Fail-safe caching (agar koi asset fail bhi ho toh SW crash nahi hoga)
+// Install: Cache Shell instantly
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
       return Promise.allSettled(
-        STATIC_ASSETS.map((asset) => 
-          cache.add(asset).catch((err) => console.warn('Cache bypass for:', asset, err))
-        )
+        SHELL_ASSETS.map((url) => cache.add(url).catch((e) => console.warn('Cache bypass:', url)))
       );
     })
   );
   self.skipWaiting();
 });
 
-// Activate: Purane cache clean up
+// Activate: Old cache cleanup
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((keys) => {
       return Promise.all(
-        keys.map((key) => {
-          if (key !== CACHE_NAME) {
-            return caches.delete(key);
-          }
+        keys.map((k) => {
+          if (k !== CACHE_NAME) return caches.delete(k);
         })
       );
     })
@@ -36,29 +32,29 @@ self.addEventListener('activate', (event) => {
   self.clients.claim();
 });
 
-// Fetch: Network-first with offline cache fallback
+// Fetch: CACHE-FIRST for local shell (survives domain death/shutdown)
 self.addEventListener('fetch', (event) => {
-  if (event.request.method !== 'GET') return;
+  const url = new URL(event.request.url);
 
-  event.respondWith(
-    fetch(event.request)
-      .then((networkResponse) => {
-        if (networkResponse && networkResponse.status === 200 && networkResponse.type === 'basic') {
-          const responseClone = networkResponse.clone();
-          caches.open(CACHE_NAME).then((cache) => {
-            cache.put(event.request, responseClone);
-          });
-        }
-        return networkResponse;
-      })
-      .catch(() => {
-        return caches.match(event.request).then((cachedResponse) => {
-          if (cachedResponse) return cachedResponse;
-          // Agar page navigation offline ho toh cached index.html dikhaye
-          if (event.request.mode === 'navigate') {
-            return caches.match('./index.html') || caches.match('./');
+  // If request is for local landing page shell
+  if (url.origin === self.location.origin) {
+    event.respondWith(
+      caches.match(event.request).then((cached) => {
+        if (cached) return cached;
+        return fetch(event.request).then((response) => {
+          if (response && response.status === 200) {
+            const clone = response.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
           }
-        });
+          return response;
+        }).catch(() => caches.match('./index.html') || caches.match('./'));
       })
+    );
+    return;
+  }
+
+  // External requests (iframe, assets) -> Network with fallback
+  event.respondWith(
+    fetch(event.request).catch(() => caches.match(event.request))
   );
 });
